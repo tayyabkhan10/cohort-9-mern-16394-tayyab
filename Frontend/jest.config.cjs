@@ -8,4 +8,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'babel-jest'
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/']
+  
 };
