@@ -5,11 +5,12 @@ import AppError from '../utils/AppError';
 import { emitToUser } from '../config/socket';
 
 export const getNotes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { search, page, limit } = req.query;
+  const { search, page, limit, folder_id } = req.query;
   const result = await notesService.getNotes(req.user!.id, {
     search: search as string | undefined,
     page: page ? parseInt(page as string, 10) : undefined,
-    limit: limit ? parseInt(limit as string, 10) : undefined
+    limit: limit ? parseInt(limit as string, 10) : undefined,
+    folder_id: folder_id as string | undefined
   });
   res.status(200).json({ success: true, data: result });
 });
@@ -20,21 +21,21 @@ export const getNote = catchAsync(async (req: Request, res: Response, next: Next
 });
 
 export const createNote = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { title, content } = req.body;
+  const { title, content, folder_id, color } = req.body;
   if (!title) {
     return next(new AppError('Title is required', 400));
   }
-  const note = await notesService.createNote(req.user!.id, { title, content });
+  const note = await notesService.createNote(req.user!.id, { title, content, folder_id, color });
   emitToUser(req.user!.id, 'note:created', note);
   res.status(201).json({ success: true, data: note });
 });
 
 export const updateNote = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { title, content } = req.body;
+  const { title, content, folder_id, color } = req.body;
   if (!title) {
     return next(new AppError('Title is required', 400));
   }
-  const note = await notesService.updateNote(req.user!.id, req.params.id, { title, content });
+  const note = await notesService.updateNote(req.user!.id, req.params.id, { title, content, folder_id, color });
   emitToUser(req.user!.id, 'note:updated', note);
   res.status(200).json({ success: true, data: note });
 });

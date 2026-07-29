@@ -10,11 +10,28 @@
     "test": "jest"
   },
   "dependencies": {
+    "@tiptap/extension-character-count": "^3.29.0",
+    "@tiptap/extension-color": "^3.29.0",
+    "@tiptap/extension-highlight": "^3.29.0",
+    "@tiptap/extension-link": "^3.29.0",
+    "@tiptap/extension-placeholder": "^3.29.0",
+    "@tiptap/extension-subscript": "^3.29.0",
+    "@tiptap/extension-superscript": "^3.29.0",
+    "@tiptap/extension-task-item": "^3.29.0",
+    "@tiptap/extension-task-list": "^3.29.0",
+    "@tiptap/extension-text-align": "^3.29.0",
+    "@tiptap/extension-text-style": "^3.29.0",
+    "@tiptap/extension-underline": "^3.29.0",
+    "@tiptap/pm": "^3.29.0",
+    "@tiptap/react": "^3.29.0",
+    "@tiptap/starter-kit": "^3.29.0",
     "axios": "^1.7.2",
+    "lucide-react": "^1.27.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.24.0",
-    "socket.io-client": "^4.7.5"
+    "socket.io-client": "^4.7.5",
+    "tiptap-extension-resize-image": "^1.4.4"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",

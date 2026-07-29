@@ -5,12 +5,15 @@ import { Note, PaginatedNotes } from '../types';
 interface NoteInput {
   title: string;
   content?: string;
+  folder_id?: string | null;
+  color?: string;
 }
 
 interface ListOptions {
   search?: string;
   page?: number;
   limit?: number;
+  folder_id?: string;
 }
 
 export const getNotes = async (userId: string, options: ListOptions = {}): Promise<PaginatedNotes> => {
@@ -24,6 +27,11 @@ export const getNotes = async (userId: string, options: ListOptions = {}): Promi
   if (options.search) {
     params.push(`%${options.search}%`);
     whereClause += ` AND (title ILIKE $${params.length} OR content ILIKE $${params.length})`;
+  }
+
+  if (options.folder_id) {
+    params.push(options.folder_id);
+    whereClause += ` AND folder_id = $${params.length}`;
   }
 
   const countResult = await pool.query(`SELECT COUNT(*) FROM notes ${whereClause}`, params);
@@ -52,18 +60,23 @@ export const getNoteById = async (userId: string, noteId: string): Promise<Note>
   return result.rows[0];
 };
 
-export const createNote = async (userId: string, { title, content }: NoteInput): Promise<Note> => {
+export const createNote = async (userId: string, { title, content, folder_id, color }: NoteInput): Promise<Note> => {
   const result = await pool.query(
-    'INSERT INTO notes (user_id, title, content) VALUES ($1, $2, $3) RETURNING *',
-    [userId, title, content || null]
+    'INSERT INTO notes (user_id, title, content, folder_id, color) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    [userId, title, content || null, folder_id || null, color || 'yellow']
   );
   return result.rows[0];
 };
 
-export const updateNote = async (userId: string, noteId: string, { title, content }: NoteInput): Promise<Note> => {
+export const updateNote = async (
+  userId: string,
+  noteId: string,
+  { title, content, folder_id, color }: NoteInput
+): Promise<Note> => {
   const result = await pool.query(
-    'UPDATE notes SET title = $1, content = $2, updated_at = now() WHERE id = $3 AND user_id = $4 RETURNING *',
-    [title, content || null, noteId, userId]
+    `UPDATE notes SET title = $1, content = $2, folder_id = $3, color = $4, updated_at = now()
+     WHERE id = $5 AND user_id = $6 RETURNING *`,
+    [title, content || null, folder_id || null, color || 'yellow', noteId, userId]
   );
   if (result.rows.length === 0) {
     throw new AppError('Note not found', 404);

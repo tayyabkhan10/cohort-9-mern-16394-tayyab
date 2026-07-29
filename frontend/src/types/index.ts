@@ -5,9 +5,18 @@ export interface User {
   created_at: string;
 }
 
+export interface Folder {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  note_count?: number;
+}
+
 export interface Note {
   id: string;
   user_id: string;
+  folder_id: string | null;
   title: string;
   content: string | null;
   created_at: string;

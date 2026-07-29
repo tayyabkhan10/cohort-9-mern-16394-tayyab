@@ -1,4 +1,4 @@
-# Notes App Backend (TypeScript)
+`# Notes App Backend (TypeScript)
 
 ## Setup
 

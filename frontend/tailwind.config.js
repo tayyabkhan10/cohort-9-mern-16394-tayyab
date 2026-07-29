@@ -26,6 +26,13 @@ module.exports = {
         body: {
           DEFAULT: '#1C1B17',
           muted: '#6B6559'
+        },
+        note: {
+          yellow: { DEFAULT: '#F5E9A8', ink: '#5C4A0A' },
+          coral: { DEFAULT: '#F3B8AA', ink: '#7A2E1E' },
+          blue: { DEFAULT: '#A9CDE8', ink: '#173A5C' },
+          mint: { DEFAULT: '#B7E0C9', ink: '#164B31' },
+          lavender: { DEFAULT: '#CFC0EA', ink: '#3D2870' }
         }
       },
       fontFamily: {

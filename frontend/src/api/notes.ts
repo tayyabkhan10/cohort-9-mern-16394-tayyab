@@ -5,6 +5,13 @@ interface ListParams {
   search?: string;
   page?: number;
   limit?: number;
+  folder_id?: string;
+}
+
+interface NotePayload {
+  title: string;
+  content: string;
+  folder_id?: string | null;
 }
 
 export const listNotes = async (params: ListParams = {}): Promise<PaginatedNotes> => {
@@ -17,13 +24,13 @@ export const getNote = async (id: string): Promise<Note> => {
   return res.data.data;
 };
 
-export const createNote = async (title: string, content: string): Promise<Note> => {
-  const res = await apiClient.post<ApiEnvelope<Note>>('/notes', { title, content });
+export const createNote = async (payload: NotePayload): Promise<Note> => {
+  const res = await apiClient.post<ApiEnvelope<Note>>('/notes', payload);
   return res.data.data;
 };
 
-export const updateNote = async (id: string, title: string, content: string): Promise<Note> => {
-  const res = await apiClient.put<ApiEnvelope<Note>>(`/notes/${id}`, { title, content });
+export const updateNote = async (id: string, payload: NotePayload): Promise<Note> => {
+  const res = await apiClient.put<ApiEnvelope<Note>>(`/notes/${id}`, payload);
   return res.data.data;
 };
 
