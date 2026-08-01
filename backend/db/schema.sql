@@ -4,7 +4,8 @@ create table users (
   id uuid primary key default uuid_generate_v4(),
   name varchar(100) not null,
   email varchar(150) unique not null,
-  password_hash text not null,
+  password_hash text,
+  google_id varchar unique,
   created_at timestamp default now()
 );
 

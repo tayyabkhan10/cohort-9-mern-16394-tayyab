@@ -1,8 +1,10 @@
+//src/services/authService.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db';
 import AppError from '../utils/AppError';
 import { User } from '../types';
+import { OAuth2Client } from 'google-auth-library';
 
 interface SignupInput {
   name: string;
@@ -63,4 +65,36 @@ export const getProfile = async (userId: string) => {
     throw new AppError('User not found', 404);
   }
   return user;
+};
+
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleLogin = async (idToken: string) => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  if (!payload || !payload.email) {
+    throw new AppError('Invalid Google token', 401);
+  }
+
+  const { email, name, sub: googleId } = payload;
+
+  let result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  let user: User = result.rows[0];
+
+  if (!user) {
+    const insertResult = await pool.query(
+      'INSERT INTO users (name, email, google_id) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
+      [name, email, googleId]
+    );
+    user = insertResult.rows[0];
+  } else if (!user.google_id) {
+    await pool.query('UPDATE users SET google_id = $1 WHERE id = $2', [googleId, user.id]);
+  }
+
+  const token = generateToken(user);
+  return { user: sanitizeUser(user), token };
 };

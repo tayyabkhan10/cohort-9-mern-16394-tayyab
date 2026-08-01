@@ -25,3 +25,11 @@ export const getMe = catchAsync(async (req: Request, res: Response, next: NextFu
   const user = await authService.getProfile(req.user!.id);
   res.status(200).json({ success: true, data: user });
 });
+export const googleLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { idToken } = req.body;
+  if (!idToken) {
+    return next(new AppError('Google idToken is required', 400));
+  }
+  const { user, token } = await authService.googleLogin(idToken);
+  res.status(200).json({ success: true, data: { user, token } });
+});

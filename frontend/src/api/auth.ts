@@ -15,3 +15,7 @@ export const getMe = async (): Promise<User> => {
   const res = await apiClient.get<ApiEnvelope<User>>('/auth/me');
   return res.data.data;
 };
+export const googleLogin = async (idToken: string) => {
+  const res = await apiClient.post('/auth/google', { idToken });
+  return res.data.data as { user: User; token: string };
+};
