@@ -9,20 +9,20 @@ export const getFolders = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createFolder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { name, color } = req.body;
+  const { name } = req.body; 
   if (!name) {
     return next(new AppError('Folder name is required', 400));
   }
-  const folder = await folderService.createFolder(req.user!.id, name, color || 'yellow');
+  const folder = await folderService.createFolder(req.user!.id, name);
   res.status(201).json({ success: true, data: folder });
 });
 
 export const updateFolder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { name, color } = req.body;
+  const { name } = req.body; 
   if (!name) {
     return next(new AppError('Folder name is required', 400));
   }
-  const folder = await folderService.updateFolder(req.user!.id, req.params.id, name, color || 'yellow');
+  const folder = await folderService.updateFolder(req.user!.id, req.params.id, name);
   res.status(200).json({ success: true, data: folder });
 });
 

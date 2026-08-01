@@ -25,7 +25,7 @@ export const createNote = catchAsync(async (req: Request, res: Response, next: N
   if (!title) {
     return next(new AppError('Title is required', 400));
   }
-  const note = await notesService.createNote(req.user!.id, { title, content, folder_id, color });
+  const note = await notesService.createNote(req.user!.id, { title, content, folder_id});
   emitToUser(req.user!.id, 'note:created', note);
   res.status(201).json({ success: true, data: note });
 });
@@ -35,7 +35,7 @@ export const updateNote = catchAsync(async (req: Request, res: Response, next: N
   if (!title) {
     return next(new AppError('Title is required', 400));
   }
-  const note = await notesService.updateNote(req.user!.id, req.params.id, { title, content, folder_id, color });
+  const note = await notesService.updateNote(req.user!.id, req.params.id, { title, content, folder_id});
   emitToUser(req.user!.id, 'note:updated', note);
   res.status(200).json({ success: true, data: note });
 });

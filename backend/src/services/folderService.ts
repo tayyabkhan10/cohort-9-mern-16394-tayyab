@@ -5,7 +5,6 @@ export interface Folder {
   id: string;
   user_id: string;
   name: string;
-  color: string;
   created_at: string;
 }
 
@@ -22,10 +21,10 @@ export const getFolders = async (userId: string): Promise<Folder[]> => {
   return result.rows;
 };
 
-export const createFolder = async (userId: string, name: string, color: string): Promise<Folder> => {
+export const createFolder = async (userId: string, name: string): Promise<Folder> => {
   const result = await pool.query(
-    'INSERT INTO folders (user_id, name, color) VALUES ($1, $2, $3) RETURNING *',
-    [userId, name, color]
+    'INSERT INTO folders (user_id, name) VALUES ($1, $2) RETURNING *',
+    [userId, name]
   );
   return result.rows[0];
 };
@@ -33,12 +32,11 @@ export const createFolder = async (userId: string, name: string, color: string):
 export const updateFolder = async (
   userId: string,
   folderId: string,
-  name: string,
-  color: string
+  name: string
 ): Promise<Folder> => {
   const result = await pool.query(
-    'UPDATE folders SET name = $1, color = $2 WHERE id = $3 AND user_id = $4 RETURNING *',
-    [name, color, folderId, userId]
+    'UPDATE folders SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+    [name, folderId, userId]
   );
   if (result.rows.length === 0) {
     throw new AppError('Folder not found', 404);

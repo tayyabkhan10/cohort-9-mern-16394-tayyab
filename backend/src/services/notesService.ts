@@ -6,7 +6,6 @@ interface NoteInput {
   title: string;
   content?: string;
   folder_id?: string | null;
-  color?: string;
 }
 
 interface ListOptions {
@@ -35,7 +34,7 @@ export const getNotes = async (userId: string, options: ListOptions = {}): Promi
   }
 
   const countResult = await pool.query(`SELECT COUNT(*) FROM notes ${whereClause}`, params);
-  const total = parseInt(countResult.rows[0].count, 10);
+  const total = Number.parseInt(countResult.rows[0].count, 10); // SonarQube compliant
 
   params.push(limit, offset);
   const dataResult = await pool.query(
@@ -60,10 +59,10 @@ export const getNoteById = async (userId: string, noteId: string): Promise<Note>
   return result.rows[0];
 };
 
-export const createNote = async (userId: string, { title, content, folder_id, color }: NoteInput): Promise<Note> => {
+export const createNote = async (userId: string, { title, content, folder_id }: NoteInput): Promise<Note> => {
   const result = await pool.query(
-    'INSERT INTO notes (user_id, title, content, folder_id, color) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [userId, title, content || null, folder_id || null, color || 'yellow']
+    'INSERT INTO notes (user_id, title, content, folder_id) VALUES ($1, $2, $3, $4) RETURNING *',
+    [userId, title, content || null, folder_id || null]
   );
   return result.rows[0];
 };
@@ -71,12 +70,12 @@ export const createNote = async (userId: string, { title, content, folder_id, co
 export const updateNote = async (
   userId: string,
   noteId: string,
-  { title, content, folder_id, color }: NoteInput
+  { title, content, folder_id }: NoteInput
 ): Promise<Note> => {
   const result = await pool.query(
-    `UPDATE notes SET title = $1, content = $2, folder_id = $3, color = $4, updated_at = now()
-     WHERE id = $5 AND user_id = $6 RETURNING *`,
-    [title, content || null, folder_id || null, color || 'yellow', noteId, userId]
+    `UPDATE notes SET title = $1, content = $2, folder_id = $3, updated_at = now()
+     WHERE id = $4 AND user_id = $5 RETURNING *`,
+    [title, content || null, folder_id || null, noteId, userId]
   );
   if (result.rows.length === 0) {
     throw new AppError('Note not found', 404);
