@@ -19,3 +19,16 @@ export const googleLogin = async (idToken: string) => {
   const res = await apiClient.post('/auth/google', { idToken });
   return res.data.data as { user: User; token: string };
 };
+export const updateProfile = async (data: { name?: string; bio?: string }) => {
+  const res = await apiClient.patch('/auth/me', data);
+  return res.data.data as User;
+};
+
+export const uploadAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  const res = await apiClient.post('/auth/me/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data.data as User;
+};

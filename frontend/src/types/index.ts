@@ -2,9 +2,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  avatar_url?: string | null;
+  bio?: string | null;
   created_at: string;
 }
-
 export interface Folder {
   id: string;
   user_id: string;

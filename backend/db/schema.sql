@@ -6,6 +6,8 @@ create table users (
   email varchar(150) unique not null,
   password_hash text,
   google_id varchar unique,
+  avatar_url text,
+  bio varchar(280),
   created_at timestamp default now()
 );
 

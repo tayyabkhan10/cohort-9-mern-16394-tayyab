@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import * as authApi from '../api/auth';
 import type { User } from '../types';
@@ -10,10 +10,11 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
+  updateUser: (nextUser: User) => void;
   logout: () => void;
 }
 
-const AuthContext = createContext(undefined as AuthContextValue | undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -30,37 +31,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const persistSession = (nextUser: User, nextToken: string) => {
+  const persistSession = useCallback((nextUser: User, nextToken: string) => {
     localStorage.setItem('notes_token', nextToken);
     localStorage.setItem('notes_user', JSON.stringify(nextUser));
     setUser(nextUser);
     setToken(nextToken);
-  };
+  }, []); 
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     const result = await authApi.login(email, password);
     persistSession(result.user, result.token);
-  };
+  }, [persistSession]);
 
-  const signup = async (name: string, email: string, password: string) => {
+  const signup = useCallback(async (name: string, email: string, password: string) => {
     const result = await authApi.signup(name, email, password);
     persistSession(result.user, result.token);
-  };
+  }, [persistSession]);
 
-  const loginWithGoogle = async (idToken: string) => {
+  const loginWithGoogle = useCallback(async (idToken: string) => {
     const result = await authApi.googleLogin(idToken);
     persistSession(result.user, result.token);
-  };
+  }, [persistSession]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('notes_token');
     localStorage.removeItem('notes_user');
     setUser(null);
     setToken(null);
-  };
+  }, []);
+  const updateUser = (nextUser: User) => {
+  localStorage.setItem('notes_user', JSON.stringify(nextUser));
+  setUser(nextUser);
+};
+
+  const contextValue = useMemo(
+    () => ({
+      user,
+      token,
+      isLoading,
+      login,
+      signup,
+      loginWithGoogle,
+      updateUser,
+      logout,
+    }),
+    [user, token, isLoading, login, signup, loginWithGoogle, updateUser, logout]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, signup, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

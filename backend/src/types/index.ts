@@ -3,10 +3,11 @@ export interface User {
   name: string;
   email: string;
   password_hash?: string;
-   google_id?: string;
-  created_at: Date;
+  google_id?: string;
+  avatar_url?: string | null;
+  bio?: string | null;
+  created_at: string;
 }
-
 export interface Note {
   id: string;
   user_id: string;
@@ -28,3 +29,4 @@ export interface PaginatedNotes {
   total: number;
   totalPages: number;
 }
+
