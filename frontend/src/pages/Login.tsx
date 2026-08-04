@@ -38,7 +38,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-canvas p-6">
       <div className="w-full max-w-[380px] bg-paper border border-canvas-line rounded-card px-9 py-10 shadow-card">
-        <div className="font-display text-[22px] font-bold text-ink mb-1">Marginalia</div>
+        <div className="font-display text-[22px] font-bold text-ink mb-1">10 Pearls</div>
         <div className="font-mono text-xs text-body-muted mb-7">Notes worth keeping</div>
         {error && (
           <div className="bg-danger-soft text-danger text-[13px] px-3 py-2.5 rounded-card mb-4">{error}</div>
