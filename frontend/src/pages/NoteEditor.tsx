@@ -21,7 +21,9 @@ const NoteEditor = () => {
   const [savedNoteId, setSavedNoteId] = useState<string | undefined>(isNew ? undefined : id);
 
   useEffect(() => {
-    foldersApi.listFolders().then(setFolders).catch(() => {});
+    foldersApi.listFolders()
+      .then(setFolders)
+      .catch((error) => console.error('Failed to load folders:', error));
   }, []);
 
   useEffect(() => {
@@ -56,8 +58,8 @@ const NoteEditor = () => {
     if (!title.trim()) return;
     try {
       await persist(title, html);
-    } catch {
-      // silent
+    } catch (error) {
+      console.error('Autosave failed:', error);
     }
   };
 
@@ -71,7 +73,8 @@ const NoteEditor = () => {
     try {
       await persist(title, content);
       navigate('/dashboard');
-    } catch {
+    } catch (error) {
+      console.error('Failed to save note:', error);
       setError('Could not save this note. Try again.');
     } finally {
       setIsSaving(false);
