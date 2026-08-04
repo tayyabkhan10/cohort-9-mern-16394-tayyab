@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Camera, Trash2, Pencil, Check, X, LogOut, Mail, CalendarDays } from 'lucide-react';
 import Spine from '../components/Spine';
 import Avatar from '../components/Avatar';
 import { useAuth } from '../context/AuthContext';
@@ -41,6 +42,8 @@ const Profile = () => {
   const [bio, setBio] = useState(user?.bio ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [isDeletingBio, setIsDeletingBio] = useState(false);
   const [error, setError] = useState('');
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -179,6 +182,33 @@ const Profile = () => {
     }
   };
 
+  const handleRemoveAvatar = async () => {
+    setError('');
+    setIsRemoving(true);
+    try {
+      const updated = await authApi.removeAvatar();
+      updateUser(updated);
+    } catch (err: any) {
+      setError(err?.response?.data?.message ?? 'Could not remove photo.');
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  const handleDeleteBio = async () => {
+    setError('');
+    setIsDeletingBio(true);
+    try {
+      const updated = await authApi.updateProfile({ bio: '' });
+      updateUser(updated);
+      setBio('');
+    } catch (err: any) {
+      setError(err?.response?.data?.message ?? 'Could not remove bio.');
+    } finally {
+      setIsDeletingBio(false);
+    }
+  };
+
   const handleSave = async () => {
     setError('');
     setIsSaving(true);
@@ -203,39 +233,50 @@ const Profile = () => {
   const geo = naturalSize ? getCropGeometry(zoom, naturalSize) : null;
 
   return (
-    <div className="flex stack:flex-col min-h-screen bg-canvas">
+    <div className="flex stack:flex-col min-h-screen bg-white">
       <Spine />
       <main className="flex-1 min-w-0">
-        <div className="border-b border-canvas-line px-14 stack:px-5 pt-11 stack:pt-6 pb-8">
+        <div className="border-b  px-14 stack:px-5 pt-11 stack:pt-6 pb-8">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-body-muted mb-2">
-                fol. 01 — account
-              </div>
+              
               <h1 className="font-display text-[40px] stack:text-[30px] leading-none text-ink">Profile</h1>
             </div>
-            {!isEditing && (
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className="font-mono text-[11px] uppercase tracking-[0.1em] text-body-muted border border-canvas-line rounded-card px-4 py-2 hover:text-ink hover:border-ink transition-colors duration-150"
-              >
-                Edit profile
-              </button>
-            )}
+           
           </div>
         </div>
 
         <div className="px-14 stack:px-5 py-11 stack:py-6 grid grid-cols-[1fr_320px] stack:grid-cols-1 gap-16 stack:gap-10 max-w-[1200px]">
           <section>
-            <div className="flex items-center gap-7 mb-10 flex-wrap">
-              <div className="relative group cursor-pointer shrink-0" onClick={openFilePicker}>
-                <Avatar name={user.name} avatarUrl={user.avatar_url} size={112} />
-                <div className="absolute inset-0 rounded-full flex items-center justify-center bg-ink/0 group-hover:bg-ink/45 transition-colors duration-200">
-                  <span className="opacity-0 group-hover:opacity-100 text-paper text-[10px] font-mono uppercase tracking-[0.1em] transition-opacity duration-200">
-                    change
-                  </span>
+            <div className="flex items-center gap-8 mb-11 flex-wrap">
+              <div className="relative shrink-0">
+                <div className="p-[3px] rounded-full bg-gradient-to-br from-ink to-canvas-line">
+                  <div className="bg-white rounded-full p-[3px]">
+                    <Avatar name={user.name} avatarUrl={user.avatar_url} size={104} />
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={openFilePicker}
+                  title="Change photo"
+                  className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-ink text-paper flex items-center justify-center border-[3px] border-canvas shadow-card hover:bg-ink-soft hover:scale-105 transition-all duration-150"
+                >
+                  <Camera size={15} strokeWidth={1.75} />
+                </button>
+
+                {user.avatar_url && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={isRemoving}
+                    title="Remove photo"
+                    className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-danger-soft text-danger flex items-center justify-center border-[3px] border-canvas hover:bg-danger-hover hover:scale-105 transition-all duration-150 disabled:opacity-50"
+                  >
+                    <Trash2 size={12} strokeWidth={1.75} />
+                  </button>
+                )}
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -247,8 +288,11 @@ const Profile = () => {
 
               {!isEditing ? (
                 <div>
-                  <div className="font-display text-[26px] text-ink leading-tight">{user.name}</div>
-                  <div className="font-mono text-[13px] text-body-muted mt-1">{user.email}</div>
+                  <div className="font-display text-[27px] text-ink leading-tight">{user.name}</div>
+                  <div className="flex items-center gap-1.5 text-body-muted mt-1.5">
+                    <Mail size={13} strokeWidth={1.75} />
+                    <span className="font-mono text-[13px]">{user.email}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="flex-1 min-w-[220px] max-w-[360px]">
@@ -272,9 +316,35 @@ const Profile = () => {
             )}
 
             <div className="max-w-[560px]">
-              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-body-muted mb-2.5">
-                Bio
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-body-muted">
+                  Bio
+                </div>
+                {!isEditing && (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      title="Edit bio"
+                      className="w-6.5 h-6.5 w-[26px] h-[26px] rounded-full flex items-center justify-center text-body-muted hover:text-ink hover:bg-canvas-line transition-colors duration-150"
+                    >
+                      <Pencil size={12} strokeWidth={1.75} />
+                    </button>
+                    {user.bio && (
+                      <button
+                        type="button"
+                        onClick={handleDeleteBio}
+                        disabled={isDeletingBio}
+                        title="Delete bio"
+                        className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-body-muted hover:text-danger hover:bg-danger-soft transition-colors duration-150 disabled:opacity-50"
+                      >
+                        <Trash2 size={12} strokeWidth={1.75} />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
+
               {!isEditing ? (
                 user.bio ? (
                   <p className="font-display italic text-[19px] leading-relaxed text-ink border-l-2 border-canvas-line pl-5">
@@ -304,16 +374,18 @@ const Profile = () => {
                   type="button"
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="font-body font-semibold text-sm rounded-card bg-ink text-paper px-5 py-2.5 hover:enabled:bg-ink-soft disabled:opacity-60 transition-colors duration-150"
+                  className="flex items-center gap-2 font-body font-semibold text-sm rounded-card bg-ink text-paper px-5 py-2.5 hover:enabled:bg-ink-soft disabled:opacity-60 transition-colors duration-150"
                 >
+                  <Check size={15} strokeWidth={2} />
                   {isSaving ? 'Saving…' : 'Save changes'}
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
                   disabled={isSaving}
-                  className="font-body font-semibold text-sm rounded-card border border-canvas-line text-ink px-5 py-2.5 hover:bg-canvas-line transition-colors duration-150"
+                  className="flex items-center gap-2 font-body font-semibold text-sm rounded-card border border-canvas-line text-ink px-5 py-2.5 hover:bg-canvas-line transition-colors duration-150"
                 >
+                  <X size={15} strokeWidth={2} />
                   Cancel
                 </button>
               </div>
@@ -321,22 +393,22 @@ const Profile = () => {
           </section>
 
           <aside>
-            <div className="bg-paper border border-canvas-line rounded-card p-6 mb-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-body-muted mb-4">
-                Colophon
+            <div className="bg-white rounded-card p-6 mb-6 shadow-card">
+              <div className="font-mono text-[10px] tracking-[0.1em] text-body-muted mb-4">
+                Info
               </div>
-              <div className="flex justify-between items-baseline py-2.5 border-b border-canvas-line">
-                <span className="text-[12px] text-body-muted">email</span>
-                <span className="text-[13px] text-ink text-right">{user.email}</span>
+              <div className="flex items-center gap-2.5 py-2.5 border-b border-canvas-line">
+                <Mail size={13} strokeWidth={1.75} className="text-body-muted shrink-0" />
+                <span className="text-[13px] text-ink truncate">{user.email}</span>
               </div>
-              <div className="flex justify-between items-baseline py-2.5">
-                <span className="text-[12px] text-body-muted">member since</span>
-                <span className="text-[13px] text-ink text-right">{formatDate(user.created_at)}</span>
+              <div className="flex items-center gap-2.5 py-2.5">
+                <CalendarDays size={13} strokeWidth={1.75} className="text-body-muted shrink-0" />
+                <span className="text-[13px] text-ink">{formatDate(user.created_at)}</span>
               </div>
             </div>
 
             <div className="border border-canvas-line rounded-card p-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-body-muted mb-3">
+              <div className="font-mono text-[10px] tracking-[0.1em] text-body-muted mb-3">
                 Session
               </div>
               <p className="text-[13px] text-body-muted mb-4 leading-relaxed">
@@ -345,8 +417,9 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full font-body font-semibold text-sm rounded-card bg-danger-soft text-danger px-4 py-2.5 hover:bg-danger-hover transition-colors duration-150"
+                className="w-full flex items-center justify-center gap-2 font-body font-semibold text-sm rounded-card bg-danger-soft text-danger px-4 py-2.5 hover:bg-danger-hover transition-colors duration-150"
               >
+                <LogOut size={15} strokeWidth={1.75} />
                 Log out
               </button>
             </div>
@@ -363,7 +436,7 @@ const Profile = () => {
             role="dialog"
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
-            className="bg-paper rounded-card border border-canvas-line p-8 w-full max-w-[360px] text-center"
+            className="bg-paper rounded-card border border-canvas-line p-8 w-full max-w-[360px] text-center shadow-card"
           >
             <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-body-muted mb-1">
               New photo
@@ -371,7 +444,7 @@ const Profile = () => {
             <p className="text-[11px] text-body-muted mb-5">Drag to reposition, use the slider to zoom</p>
 
             <div
-              className="relative w-[220px] h-[220px] rounded-full overflow-hidden border border-canvas-line mx-auto mb-5 touch-none select-none cursor-grab active:cursor-grabbing bg-canvas"
+              className="relative w-[220px] h-[220px] rounded-full overflow-hidden border border-canvas-line mx-auto mb-5 touch-none select-none cursor-grab active:cursor-grabbing bg-white"
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -418,16 +491,18 @@ const Profile = () => {
                 type="button"
                 onClick={confirmAvatarUpload}
                 disabled={isUploading}
-                className="flex-1 font-body font-semibold text-sm rounded-card bg-ink text-paper px-4 py-2.5 hover:enabled:bg-ink-soft disabled:opacity-60 transition-colors duration-150"
+                className="flex-1 flex items-center justify-center gap-2 font-body font-semibold text-sm rounded-card bg-ink text-paper px-4 py-2.5 hover:enabled:bg-ink-soft disabled:opacity-60 transition-colors duration-150"
               >
+                <Check size={15} strokeWidth={2} />
                 {isUploading ? 'Uploading…' : 'Set as photo'}
               </button>
               <button
                 type="button"
                 onClick={closePreview}
                 disabled={isUploading}
-                className="flex-1 font-body font-semibold text-sm rounded-card border border-canvas-line text-ink px-4 py-2.5 hover:bg-canvas-line transition-colors duration-150"
+                className="flex-1 flex items-center justify-center gap-2 font-body font-semibold text-sm rounded-card border border-canvas-line text-ink px-4 py-2.5 hover:bg-canvas-line transition-colors duration-150"
               >
+                <X size={15} strokeWidth={2} />
                 Cancel
               </button>
             </div>

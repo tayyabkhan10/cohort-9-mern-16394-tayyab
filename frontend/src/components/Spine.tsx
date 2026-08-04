@@ -17,7 +17,7 @@ const Spine = () => {
           <NotebookPen size={18} strokeWidth={2.25} />
         </div>
         <span className="font-display text-[11px] font-semibold tracking-[0.12em] mt-1 stack:mt-0 stack:ml-2">
-          MARGINALIA
+          10 Pearls
         </span>
       </div>
 

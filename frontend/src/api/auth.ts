@@ -32,3 +32,7 @@ export const uploadAvatar = async (file: File) => {
   });
   return res.data.data as User;
 };
+export const removeAvatar = async () => {
+  const res = await apiClient.delete('/auth/me/avatar');
+  return res.data.data as User;
+};

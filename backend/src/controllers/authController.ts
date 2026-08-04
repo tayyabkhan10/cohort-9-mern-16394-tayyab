@@ -63,3 +63,7 @@ export const uploadAvatar = catchAsync(async (req: Request, res: Response, next:
   const user = await authService.updateAvatar(req.user!.id, avatarUrl);
   res.status(200).json({ success: true, data: user });
 });
+export const removeAvatar = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = await authService.removeAvatar(req.user!.id);
+  res.status(200).json({ success: true, data: user });
+});

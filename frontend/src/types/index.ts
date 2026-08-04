@@ -42,3 +42,4 @@ export interface ApiEnvelope<T> {
   data: T;
   message?: string;
 }
+export type NoteColor = 'yellow' | 'coral' | 'blue' | 'mint' | 'lavender';

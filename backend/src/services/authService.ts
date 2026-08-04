@@ -143,3 +143,10 @@ export const googleLogin = async (idToken: string) => {
   const token = generateToken(user);
   return { user: sanitizeUser(user), token };
 };
+export const removeAvatar = async (userId: string) => {
+  const result = await pool.query(
+    'UPDATE users SET avatar_url = NULL WHERE id = $1 RETURNING id, name, email, avatar_url, bio, created_at',
+    [userId]
+  );
+  return sanitizeUser(result.rows[0]);
+};
