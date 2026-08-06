@@ -1,4 +1,4 @@
-`# Notes App Backend (TypeScript)
+# Notes App Backend (TypeScript)
 
 ## Setup
 
@@ -10,14 +10,26 @@
 
 ## API Endpoints
 
+### Auth
 - POST /api/auth/signup
 - POST /api/auth/login
 - GET /api/auth/me (requires token)
+
+### Notes
 - GET /api/notes?search=&page=&limit= (requires token)
 - GET /api/notes/:id (requires token)
 - POST /api/notes (requires token)
 - PUT /api/notes/:id (requires token)
 - DELETE /api/notes/:id (requires token)
+
+### Folders
+- GET /api/folders (requires token)
+- POST /api/folders (requires token)
+- PUT /api/folders/:id (requires token)
+- DELETE /api/folders/:id (requires token)
+
+### Uploads
+- POST /api/uploads (requires token)
 
 All protected routes require header: `Authorization: Bearer <token>`
 

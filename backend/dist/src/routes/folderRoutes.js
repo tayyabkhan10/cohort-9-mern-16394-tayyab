@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const express_1 = require("express");
+const folderController = tslib_1.__importStar(require("../controllers/folderController"));
+const auth_1 = tslib_1.__importDefault(require("../middleware/auth"));
+const router = (0, express_1.Router)();
+router.use(auth_1.default);
+router.get('/', folderController.getFolders);
+router.post('/', folderController.createFolder);
+router.put('/:id', folderController.updateFolder);
+router.delete('/:id', folderController.deleteFolder);
+exports.default = router;

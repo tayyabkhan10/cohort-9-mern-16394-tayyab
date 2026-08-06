@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const express_1 = require("express");
+const authController = tslib_1.__importStar(require("../controllers/authController"));
+const auth_1 = tslib_1.__importDefault(require("../middleware/auth"));
+const upload_1 = tslib_1.__importDefault(require("../middleware/upload"));
+const router = (0, express_1.Router)();
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+router.get('/me', auth_1.default, authController.getMe);
+router.post('/google', authController.googleLogin);
+router.patch('/me', auth_1.default, authController.updateProfile);
+router.delete('/me/avatar', auth_1.default, authController.removeAvatar);
+router.post('/me/avatar', auth_1.default, upload_1.default.single('avatar'), authController.uploadAvatar);
+exports.default = router;

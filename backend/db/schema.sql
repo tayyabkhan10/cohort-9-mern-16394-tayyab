@@ -8,24 +8,24 @@ create table users (
   google_id varchar unique,
   avatar_url text,
   bio varchar(280),
-  created_at timestamp default now()
+  created_at timestamptz not null default now()
 );
 
 create table folders (
   id uuid primary key default uuid_generate_v4(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid not null references users(id) on delete cascade,
   name varchar(100) not null,
-  created_at timestamp default now()
+  created_at timestamptz not null default now()
 );
 
 create table notes (
   id uuid primary key default uuid_generate_v4(),
-  user_id uuid references users(id) on delete cascade,
+  user_id uuid not null references users(id) on delete cascade,
   folder_id uuid references folders(id) on delete set null,
   title varchar(255) not null,
   content text,
-  created_at timestamp default now(),
-  updated_at timestamp default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create index idx_notes_user_id on notes(user_id);

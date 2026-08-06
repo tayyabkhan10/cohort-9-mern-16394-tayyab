@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const express_1 = require("express");
+const notesController = tslib_1.__importStar(require("../controllers/notesController"));
+const auth_1 = tslib_1.__importDefault(require("../middleware/auth"));
+const router = (0, express_1.Router)();
+router.use(auth_1.default);
+router.get('/', notesController.getNotes);
+router.get('/:id', notesController.getNote);
+router.post('/', notesController.createNote);
+router.put('/:id', notesController.updateNote);
+router.delete('/:id', notesController.deleteNote);
+exports.default = router;
