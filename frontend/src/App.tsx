@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
-function Placeholder({ label }: { label: string }) {
-  return <div className="placeholder">{label}</div>;
+function Placeholder({ label }: Readonly<{ label: string }>) {
+  return <div className="p-8 text-center">{label}</div>;
 }
 
 export default function App() {
