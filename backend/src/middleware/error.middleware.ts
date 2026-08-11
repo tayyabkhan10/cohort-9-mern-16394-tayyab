@@ -15,6 +15,17 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, _next
     return;
   }
 
+  if (
+    err instanceof SyntaxError &&
+    "status" in err &&
+    err.status === 400 &&
+    "type" in err &&
+    err.type === "entity.parse.failed"
+  ) {
+    res.status(400).json({ message: "Invalid JSON body" });
+    return;
+  }
+
   logger.error({ err, path: req.path }, clientMessage);
   res.status(500).json({ message: clientMessage });
 }
